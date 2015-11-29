@@ -1,0 +1,6 @@
+test example circ1
+
+Circ1src.hs            source code for specification
+Circ1manualxform.hs    transformed by hand, showing intended structure
+Circ1struc.hs          uses the transformed circuit
+Circ1main.hs           main program, uses Circ1struc

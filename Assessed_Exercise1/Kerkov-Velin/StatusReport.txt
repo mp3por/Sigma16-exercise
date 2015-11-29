@@ -1,0 +1,40 @@
+course: CA4
+exercise: 1
+date: 2015-11-06
+surname: Kerkov
+forename: Velin
+email: 2022691K@student.gla.ac.uk
+
+Part 1 - Part 1 has been fully completed. My solution compiles and runs without 
+any errors or warnings and appears to run correctly. I tested it by creating 
+test data and looked at the output to verify the circuits correctness. The test 
+data consists of words which are fed into the circuit simulator on each clock 
+cycle. In the circuit simulator I extract the needed bits and feed them into the 
+circuit. I catch the output from the circuit and display it in the console. For 
+Part 1 I created two test inputs. The first one test the general expected 
+behavior of the circuit, while the second one tests if the reset is handled 
+correctly. I believe it all works and would highlight that I tried to make it 
+as simple and efficient as possible. The circuit works by creating 9 dffs which 
+represent the 9 states the system could be in. Then it just alternates in a 
+circular way from the first to the second and so on until the last one which 
+goes back to the first state. The circuit also can respond at any time to a reset 
+signal which brings it back to the first state. To solve this problem I first 
+created a flow diagram on a piece of paper which shows all states the system can 
+take. Then I wrote if statements for every state when should it be active. Then 
+I coded this up such that every state was a dff with a name and every 'if' was 
+a multiplexor/or/and gate. I then combined all the states for green, red and 
+amber with an 'or' to output the correct values.
+
+Part 2 - Part 2 has been fully completed. My solution compiles and runs without 
+any errors or warnings and appears to run correctly. I tested the circuit using 
+the same method as when testing Part 1. I created 5 test inputs all of which 
+test specific cases. There are comments in the Testbench.hs which tell what does 
+each test test for. My solution works by dividing the problem into 2 separate 
+problems - the counter and the state transitioning. I have created a counter 
+circuit which handles all the logic regarding the counter and just included its 
+output in the state-transitioning circuit which handles how and when states are 
+changed. This way I believe it is much clearer to read. I have created separate 
+tests for the counter to make sure it works correctly. To solve this problem I 
+created the CounterCircuit, tested it and then moved on to the state-transitioning 
+circuit. When designing the state-transitioning circuit I used the same approach 
+as in Part 1.

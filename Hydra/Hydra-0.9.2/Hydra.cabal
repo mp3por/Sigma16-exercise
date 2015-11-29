@@ -1,0 +1,50 @@
+name:		  Hydra
+version:	  0.9.2
+author:		  John T. O'Donnell
+copyright:	  Copyright (c) 2015 John T. O'Donnell
+license: 	  GPL
+
+synopsis:	  Computer hardware description language
+
+description:      Hydra is a functional language for specifying the
+                  structure and behavior of digital circuits.  It
+                  supports several levels of abstraction, including
+                  logic gates, register transfer level, datapath and
+                  control, and processors.  There are tools for
+                  simulating circuits, generating netlists, and
+                  emulating instruction set architectures.  There is
+                  also a GUI (see the HydraGUI package) that makes it
+                  easy to run programs on the emulator and the circuit
+                  simulator.  Hydra is free software.
+
+category:         Language Hardware
+stability:        experimental
+
+license-file:     LICENSE
+homepage:         http://www.dcs.gla.ac.uk/~jtod/hydra/
+package-URL:      http://www.dcs.gla.ac.uk/~jtod/hydra/download
+maintainer:       john.odonnell@glasgow.ac.uk
+
+cabal-version:    >= 1.6
+build-type:       Simple
+tested-with:      GHC == 7.4.1
+
+library
+  build-depends:   base >= 4 && <5,
+                   transformers >= 0.3 && < 0.5
+  hs-source-dirs:  src
+
+  exposed-modules:
+    HDL.Hydra.Core.Lib,
+    HDL.Hydra.Core.PrimData,
+    HDL.Hydra.Core.Signal,
+    HDL.Hydra.Core.SigStream,
+    HDL.Hydra.Core.Group,
+    HDL.Hydra.Core.Pattern,
+    HDL.Hydra.Core.SigBool,
+    HDL.Hydra.Core.CombTools,
+    HDL.Hydra.Core.Testbench,
+    HDL.Hydra.Core.RTL,
+
+    HDL.Hydra.Circuits.Combinational,
+    HDL.Hydra.Circuits.Register

@@ -1,0 +1,285 @@
+
+------------------------------------------------------------------------
+-- Old deleted stuff...
+------------------------------------------------------------------------
+
+{- this is old, from when the whole def was translated to hydra type
+     to_hydra <- runErrorT (thToHyCD srcdec)
+     case to_hydra of
+       Left err ->
+         do runIO (putStrLn "Invalid Hydra, skipping transformation")
+            return srcdec
+       Right hy ->
+         do runIO $ putStrLn "Hydra representation:"
+            runIO $ putStrLn (show hy)
+--            runIO $ ppHydra [hy]
+            runIO $ putStrLn "Transformed Hydra code:"
+            xhy <- transformHydra hy
+            runIO $ putStrLn (show xhy)
+            final_code <- hyToThCD hy
+            runIO $ putStrLn "Transformed code:"
+            runIO (putStrLn (prDec final_code))
+            return final_code
+
+prDecs :: [Dec] -> String
+prDecs ds = concat (zipWith f ds [0..])
+  where f d i = "Top level " ++ show i ++ "\n"
+                  ++ "prettyprint...\n" ++  prDec d ++ "\n\n"
+                  ++ "concrete syntax" ++ show d ++ "\n\n"
+     
+showModuleCode :: Q [Dec] -> Q [Dec]
+showModuleCode source =
+  do x <- source
+     runIO (putStrLn "~~~~~~~~~~~~~~~~~~~~~")
+     runIO (putStrLn "Show Module Code")
+     runIO (putStrLn "~~~~~~~~~~~~~~~~~~~~~")
+     let str = prDecs x
+     runIO (putStrLn str)
+--     ys <- mapQ x []
+     return []
+
+-- Conversions between specification representations
+--     Convert from TH representation to Hydra representation
+--     Convert from Hydra representation to TH representation
+
+------------------------------------------------------------------------
+--     Convert from Hydra representation to TH representation
+-- Don't need this if the whole transformation is done within TH rep
+------------------------------------------------------------------------
+
+hyToThExp :: Cexp -> Q Exp
+hyToThExp (Ename name) = return (VarE name)
+hyToThExp (Eapp e1 e2) =
+  do e1' <- hyToThExp e1
+     e2' <- hyToThExp e2
+     return (AppE e1' e2')
+hyToThExp (Etup xs) =
+  do xs' <- mapM hyToThExp xs
+     return (TupE xs')
+
+hyToThPat :: Cpat -> Q Pat
+hyToThPat (Pname name) = return (VarP name)
+
+hyToThSigEq :: SigEqu -> Q Dec
+hyToThSigEq (SEq p e) =
+  do p' <- hyToThPat p
+     e' <- hyToThExp e
+     return (ValD p' (NormalB e') [])
+
+hyToThCD :: CircDef -> Q Dec
+hyToThCD (CT x) = return x
+hyToThCD (CD name ps e eqs) =
+  do ps' <- mapM hyToThPat ps
+     e' <- hyToThExp e
+     eqs' <- mapM hyToThSigEq eqs
+     return (FunD name [Clause ps' (NormalB e') eqs'])
+
+thToHyExp :: Exp -> ErrQ Cexp
+thToHyExp (VarE name) = return (Ename name)
+thToHyExp (AppE e1 e2) =
+  do e1' <- thToHyExp e1
+     e2' <- thToHyExp e2
+     return (Eapp e1' e2')
+thToHyExp (TupE xs) =
+  do xs' <- mapM thToHyExp xs
+     return (Etup xs')
+thToHyExp _ = throwError HyBadExp
+
+thToHyPat :: Pat -> ErrQ Cpat
+thToHyPat (VarP name) = return (Pname name)
+thToHyPat _ = throwError HyBadPat
+
+thToHySigEq :: Dec -> ErrQ SigEqu
+thToHySigEq (ValD p (NormalB e) []) =
+  do p' <- thToHyPat p
+     e' <- thToHyExp e
+     return (SEq p' e')
+thToHySigEq _ = throwError HyBadPat
+
+thToHyCD :: Dec -> ErrQ CircDef
+thToHyCD (FunD name [Clause ps (NormalB e) eqs]) =
+  do ps' <- mapM thToHyPat ps
+     e' <- thToHyExp e
+     eqs' <- mapM thToHySigEq eqs
+     return (CD name ps' e' eqs')
+thToHyCD x@(SigD a b) = return (CT x)    -- circuit type
+
+thToHyCD (FunD _ _) = throwError HyBadPat -- "cd, at least a FunD"
+thToHyCD _ = throwError HyBadPat -- error "bad circuit definition"
+
+thToHyCDs :: [Dec] -> ErrQ [CircDef]
+thToHyCDs ds = mapM thToHyCD ds
+
+ppHydra :: [CircDef] -> IO [()]
+ppHydra xs = mapM ppCD xs
+
+ppCD :: CircDef -> IO ()
+ppCD (CT x) = putStrLn "\nCircuit type"
+ppCD (CD name ps body equs) =
+  do putStrLn "\nCircuit definition"
+     putStrLn ("  Name = " ++ show name)
+     mapM ppPat ps
+     putStrLn "  Body = "
+     ppExp 2 body
+     mapM ppEqu equs
+     putChar '\n'
+     return ()
+
+indent :: Int -> IO ()
+indent i = putStr ((take i) (repeat ' '))
+
+ppExp :: Int -> Cexp -> IO ()
+ppExp i (Ename name) =
+  do indent i
+     putStrLn ("EN = " ++ show name)
+ppExp i (Eapp f x) =
+  do indent i
+     putStr "(Application\n"
+     ppExp (i+2) f
+     putChar '\n'
+     ppExp (i+2) x
+     putStrLn ")"
+     return ()
+ppExp i (Etup xs) =
+  do indent i
+     putStrLn "Begin Exp Tuple"
+     mapM (ppExp (i+2)) xs
+     indent i
+     putStrLn "End Exp Tuple"
+     return ()
+ppExp i (Eword xs) =
+  do putStrLn "  expression word "
+     mapM (ppExp (i+2)) xs
+     return ()
+
+ppEqu :: SigEqu -> IO ()
+ppEqu (SEq p e) =
+  do putStr "  equation "
+     ppPat p
+     putStr " = "
+     ppExp 2 e
+     putChar '\n'
+
+------------------------------------------------------------------------
+--     Examples and test cases of Hydra representation
+------------------------------------------------------------------------
+
+{- Expressions -}
+
+-- x
+e01 = Ename (mkName "x")
+
+-- inv x
+e02 = Eapp (Ename (mkName "inv")) (Ename (mkName "x"))
+
+-- and2 x y
+e03 = Eapp (Eapp (Ename (mkName "and2"))
+                 (Ename (mkName "x")))
+           (Ename (mkName "y"))
+
+-- xor3 x y z
+e04 = Eapp (Eapp (Eapp (Ename (mkName "xor3"))
+                        (Ename (mkName "x")))
+                 (Ename (mkName "y")))
+           (Ename (mkName "z"))
+
+-- (x,y)
+e05 = Etup [Ename (mkName "x"), Ename (mkName "y")]
+
+-- and2 a (inv y)
+-- (x,y,z)
+-- (a,(b,c))
+-- ((a,b),(c,d),f)
+-- (and2 x y, inv z)
+-- [and2 c x0, and2 c x1, and2 c x2, and2 c x3]
+-- [(x0,y0), (x1,y1), (x2,y2)]
+
+{- Patterns -}
+
+-- x
+p01 = Pname (mkName "x")
+
+-- zero
+-- sum
+-- (x,y)
+-- (x,y,z)
+-- (a,(b,c))
+-- ((a,b),(c,d),f)
+
+{- Signal equations -}
+
+-- y = inv x
+eq01 = SEq (Pname (mkName "y"))
+           (Eapp (Ename (mkName "inv")) (Ename (mkName "x")))
+
+{- Circuit defniitions -}
+
+-- cinv x = buf y
+--   where y = inv x
+cd1 =
+  let buf = mkName "buf"
+      inv = mkName "inv"
+      x   = mkName "x"
+      y   = mkName "y"
+  in CD (mkName"cinv") [Pname x] (Eapp (Ename buf) (Ename y))
+        [SEq (Pname y) (Eapp (Ename inv) (Ename x))]
+
+-- cd2
+--  simple_gates x y = and2 p y
+--    where p = inv x
+--
+cd2 =
+  let simple_gates = mkName "simple_gates"
+      x    = mkName "x"
+      y    = mkName "y"
+      p    = mkName "p"
+      and2 = mkName "and2"
+      inv  = mkName "inv"
+  in FunD simple_gates
+       [Clause
+          [VarP x, VarP y]
+          (NormalB
+              (AppE
+                 (AppE (VarE and2) (VarE p))
+                 (VarE y)))
+          [ValD
+            (VarP p)
+            (NormalB
+              (AppE (VarE inv)
+                    (VarE x)))
+            []]
+       ]
+
+A Name (defined by TH) is used rather than a String to denote an
+identifier.
+
+data Cexp
+  = Ename Language.Haskell.TH.Name
+  | Eapp Cexp Cexp
+  | Etup [Cexp]
+  | Eword [Cexp]
+  deriving Show
+
+-- Signal equations
+
+data SigEqu = SEq Cpat Cexp
+  deriving Show
+
+-- Circuit definition
+
+data CircDef
+  = CD Language.Haskell.TH.Name [Cpat] Cexp [SigEqu]
+  | CT  Dec -- circuit type
+  deriving Show
+
+------------------------------------------------------------------------
+-- Conversions between specification representations
+------------------------------------------------------------------------
+
+The circuit analyses and transformations are performed on the Hydra
+domain specific language (i.e. the Hydra representation).  Template
+Haskell is used only to provide an easy way to parse the Haskell
+source code.  There are functions for converting from the TH
+representation to Hydra, and to convert back.
+
+-}

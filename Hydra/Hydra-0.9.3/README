@@ -1,0 +1,340 @@
+% README
+% John T. O'Donnell
+
+## Overview
+
+Hydra is a Computer Hardware Description Language that supports the
+design of digital circuits and computer architectures.  It includes
+software tools for circuit specification and simulation.
+
+Hydra is a domain specific language, implemented by embedding in the
+pure functional programming language Haskell (www.haskell.org/).  A
+familiarity with Haskell is helpful but not required in order to use
+Hydra to design circuits.
+
+This is free software and is distributed under the GPL License, either
+version 3 or (at your option) any later version.  See the LICENSE and
+LICENSE_GPL3 files.
+
+The INSTALL file explains how to install and use the software.
+
+Documentation, including a tutorial to help you get started, is
+available in the doc directory.
+
+This is experimental software, and is currently under development.
+Some features that have appeared in past versions of Hydra are not
+supported in this release, although it is intended that they will be
+supported in the near future.  In particular, the automated
+transformations and metaprogramming tools described in some of the
+research papers are not supported in this version.
+
+For more information, see www.dcs.gla.ac.uk/~jtod/hydra/
+
+## Author
+
+John T. O'Donnell
+John.ODonnell@glasgow.ac.uk
+www.dcs.gla.ac.uk/~jtod/
+
+# Installation
+
+---------------------------------------------------------------------------
+## Quick start
+
+On Linux, you can compile and install using the following commands:
+
+     runhaskell Setup configure --user
+     runhaskell Setup build
+     runhaskell Setup haddock --css=doc/style.css
+     runhaskell Setup install
+
+On Windows, copy and unzip the binary installation into your file
+space.
+
+For some explanation and further details, read the following sections.
+
+---------------------------------------------------------------------------
+## Requirements
+
+In order to build the system, the following additional software is
+required:
+
+* ghc is a Haskell compiler.
+
+* gtk2hs is a toolkit for building graphical user interfaces.
+
+* haddock produces hyperlinked documentation of library code.
+
+* pandoc generates html documentation from plain text input.
+
+Tested with ghc-6.10.3
+
+---------------------------------------------------------------------------
+## Installation on Gnu/Linux
+
+### Required software
+
+#### Haskell compiler: ghc
+
+Find out whether ghc is already installed on your system by entering
+the command ghci.  If it's already there, then skip the rest of this
+section.
+
+     $ ghci
+     GHCi, version 6.10.1: http://www.haskell.org/ghc/  :? for help
+     Loading package ghc-prim ... linking ... done.
+     Loading package integer ... linking ... done.
+     Loading package base ... linking ... done.
+     Prelude> 
+
+If the compiler isn't already there, you can download and install it.
+Visit the Glasgow Haskell Compiler web page and follow the
+installation instructions there:
+
+     www.haskell.org/ghc/
+
+#### Graphical user interface: gtk2hs
+
+Download and install gtk2hs-0.10.1
+
+     ./configure --enable-docs -with-user-pkgconf --prefix=$HOME
+     gmake
+     gmake install
+
+#### Additional Haskell packages
+
+First, download and install Cabal, e.g. Cabal-1.6.0.2.  Follow the
+instructions in README.
+
+Then install pandoc using cabal, with the following shell command:
+
+     cabal install pandoc
+
+### Building and installing Hydra
+
+Download the Hydra software.  It consists of a single tarball file,
+with a name of the form Hydra-<version>.tar.gz.  For example version
+1.2.3 would have the filename Hydra-1.2.3.tar.gz.
+
+Open a shell and change to the directory containing the tarball.
+Enter the following commands, replacing <version> with the actual
+version number of the file.
+
+     tar -xzf Hydra-<version>.tar.gz
+     cd Hydra-<version>
+     runhaskell Setup configure --with-compiler=ghc-6.10.1 --user
+     runhaskell Setup build
+     runhaskell Setup haddock --css=doc/style.css
+     runhaskell Setup install
+
+These commands will install Hydra in the standard location within the
+user file space.  You do not need special "root" privilege to do the
+installation, but the software will not be accessible to other users.
+On a personal computer, this is normally the best choice.
+
+If you want to install Hydra in the system file space, it will be
+available to all users, but you need root privilege to carry out the
+last step (install).  A system installation is appropriate for a
+networked system.  To do this, omit the --user option from the first
+step (configure).
+
+### Testing
+
+To test the installation, you can run one of the examples packaged
+with Hydra.  Create a working directory in your filespace, and copy an
+example circuit into it:
+
+     mkdir MyCircuits
+     cd MyCircuits
+     cp Hydra-<version>/examples/Multiply.hs .
+
+The example file, Multiply.hs, contains a specification of a digital
+circuit that multiplies binary numbers, a simulation driver, and
+sample test data.  The following commands run the simulation.  The
+first step is to launch ghci, the interactive Haskell implementation,
+with the Hydra package preloaded.  After ghci starts, load the example
+file, and then run the simulation by entering main.  You can exit ghci
+by entering :quit.
+
+     ghci -package Hydra
+     :load Multiply
+     main
+     :quit
+
+### Running Hydra from the source directory
+
+It isn't necessary to install Hydra as a package visible to ghc, or to
+use the cabal tools.  This section shows how to use it directly from
+the source directory.  All you need is to have a working ghc
+installation (so the ghci command starts the interactive system), and
+a directory containing the Hydra source.
+
+Obtain the Hydra software from /users/staff/jtod/public/hydra.  It
+consists of a single tarball file, with a name of the form
+
+    Hydra-<version>.tar.gz
+
+For example version 0.3.2 has the filename Hydra-0.3.2.tar.gz.  Unpack
+the file:
+
+     tar -xzf Hydra-<version>.tar.gz
+
+Change to the directory containing your project.  Your source module
+needs to import Hydra.  Launch ghci:
+
+    ghci -i/home/mylogin/Hydra-0.3.2/
+
+If you like, you can define an alias so it isn't necessary to type
+such a long command to launch the system.  If you use the bash shell,
+add this to your .bashrc file:
+
+    alias hydra='ghci -i/home/mylogin/Hydra-0.3.2/'
+
+To test the installation, you can run one of the examples packaged
+with Hydra.  Create a working directory in your filespace, and copy an
+example circuit into it:
+
+     mkdir MyCircuits
+     cd MyCircuits
+     cp Hydra-<version>/examples/Multiply.hs .
+
+The example file, Multiply.hs, contains a specification of a digital
+circuit that multiplies binary numbers, a simulation driver, and
+sample test data.  The following commands run the simulation.  The
+first step is to launch ghci with the Hydra package preloaded.  After
+ghci starts, load the example file, and then run the simulation by
+entering main.  You can exit ghci by entering :quit.
+
+     hydra
+     :load Multiply
+     main
+     :quit
+
+------------------------------------------------------------------------
+## Installation on Windows XP
+
+### Required software
+
+#### Haskell compiler: ghc
+
+#### Graphical user interface: gtk2hs
+
+#### Additional Haskell packages
+
+### Building and installing Hydra
+
+Download the Hydra software.  It consists of a single tarball file,
+with a name of the form Hydra-<version>.tar.gz.  For example version
+1.2.3 would have the filename Hydra-1.2.3.tar.gz.
+
+Open a command prompt window.  Change to the directory containing the
+tarball, and enter the following commands, replacing <version> with
+the actual version number of the file.  This will install Hydra into
+the standard location.
+
+     runhaskell Setup configure
+     runhaskell Setup build
+     runhaskell Setup haddock --css=doc/style.css
+     runhaskell Setup install
+
+You can also install the application in some other location in the
+file system.  To do so, first decide where you want to put the
+application, for example "C:\My Documents\programs\hydra".  Now enter
+the following commands in a command prompt (you need to be in the
+source folder):
+
+     runhaskell Setup configure --prefix="chosen location"
+     runhaskell Setup build
+     runhaskell Setup haddock --css=doc/style.css
+     runhaskell Setup install
+
+The result of this is a binary installation, consisting of a single
+folder named Hydra-<verstion> in the location that you chose.  This
+binary installation is not the same as the source folder Hydra-w.x.y
+that you are using for the installation.
+
+You can now move or copy the binary installation folder to some other
+location, and it will continue to work.  This is because Windows
+allows a program to find out its file location: when you launch Hydra,
+it will determine where it is, and then access its data files relative
+to its own location.  In other words, the application is relocatable.
+(Unfortunately, applications on linux are not relocatable.)  This
+approach is useful if you want to build the application folder on your
+own computer, and then copy it onto a shared file system so others can
+use it.
+
+
+First download the Hydra source directory, put it somewhere in your
+file space, and unzip it.  Thus you will have a folder with a name
+like Hydra-1.2.3, where 1.2.3 is the version number.  In a command
+Prompt shell window, navigate to the folder that contains the package,
+for example
+
+     C:    (this switches you from whatever default disk you're on to the C disk)
+     cd Docum<tab>  (the <tab> key will complete the name automatically, so you don't have to type long names)
+     cd jtod  (my user name)
+     cd My Do<tab>
+     cd Hydra
+     cd Hydra-1.2.3
+
+Decide where you want to put the installation, for example in a folder
+"ghc" within another folder "installs" in your My Documents folder.
+The full name of this location is
+
+     C:\Documents and Settings\myusername\My Documents\installs\ghc
+
+Of course, replace myusername with *your* username!
+
+That location is only an example; the installation can go anywhere.
+The location of the installation is distinct from the folder
+containing the package folder that you downloaded: to "install a
+package" means to copy its key files into their final place on the
+disk, from where they can be executed.
+
+Now enter the following commands.  The first one says where to put the
+installation; thus --prefix=<location> means that the specified
+location will contain the installed files.  If this location contains
+spaces, then it needs to be placed inside double-quote marks "path
+with spaces".
+
+     "C:\Documents and Settings\myusername\My Documents\installs\ghc"
+
+
+     runhaskell Setup configure --user --prefix="C:\...location..."
+     runhaskell Setup build
+     runhaskell Setup install --user
+
+The final installation step will tell you where the files have been
+placed:
+
+     Installing library in ... (ghc knows how to find the Hydra library here)
+     Installing executables in C:\Documents and Settings\myusername\My Documents\installs\ghc\bin
+
+Putting C:\ghc\bin into Environment Variables, so it can be found to
+execute
+
+     Start : My Computer (right click)
+     brings up System Properties dialog box, click Advanced tab
+     click Environment Variables
+     select variable Path, then click Edit
+     Insert C:\Documents and Settings\myusername\My Documents\installs\ghc\bin in the Variable value
+          text entry (the entries are separated by semicolon  ;) 
+
+There are several ways to launch the application:
+
+* Click Start, Run... In the "Open" text entry, type the name of the
+  program, e.g. HydraEmu, and it should launch
+
+* In a Command Prompt window, type the name of the program
+
+* Click My Computer, click Local Disk (C:), click ghc, click bin, then
+  click the icon for the program (its Type is Application)
+
+### Testing
+
+
+------------------------------------------------------------------------
+## Package development and maintainance
+
+     runhaskell Setup sdist --snapshot     {create a tar file}
+     runhaskell Setup clean                {remove files built by cabal}

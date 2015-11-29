@@ -1,0 +1,129 @@
+Why is the 'pc' gets incremented from 67th cycle to 68th cycle
+
+
+
+Clock cycle 66
+Computer system inputs
+         reset=0 dma=0 dma_a=0000 dma_d=0000
+ctl_start = 0
+
+Control state
+   st_instr_fet = 0  st_dispatch = 0       st_add = 0       st_sub = 0
+        st_mul0 = 0     st_cmplt = 0     st_cmpeq = 0     st_cmpgt = 0
+       st_trap0 = 0      st_lea0 = 0      st_lea1 = 0     st_load0 = 0
+       st_load1 = 0     st_load2 = 0    st_store0 = 0    st_store1 = 0
+      st_store2 = 0     st_jump0 = 0     st_jump1 = 0    st_jumpf0 = 1
+      st_jumpf1 = 0    st_jumpt0 = 0    st_jumpt1 = 0      st_jal0 = 0
+        st_jal1 = 0
+
+Control signals
+    ctl_alu_a   = 1  ctl_alu_b   = 1  ctl_alu_c   = 0  ctl_alu_d   = 0
+    ctl_x_pc    = 1  ctl_y_ad    = 0  ctl_rf_ld   = 0  ctl_rf_pc   = 0
+    ctl_rf_alu  = 0  ctl_rf_sd   = 1  ctl_ir_ld   = 0  ctl_pc_ld   = 1
+    ctl_ad_ld   = 1  ctl_ad_alu  = 0  ctl_ma_pc   = 1  ctl_sto     = 0
+
+Datapath
+    ir = f604  pc = 000f  ad = 001a   a = 0000   b = 0012   r = 0010
+     x = 000f   y = 0012   p = 0011  ma = 000f  md = 0000 cnd = 0
+
+Memory
+   ctl_sto = 0      m_sto = 0
+     m_addr = 000f  m_real_addr = 000f  m_data = 0000  m_out =0011
+
+
+........................................................................
+Clock cycle 67
+Computer system inputs
+         reset=0 dma=0 dma_a=0000 dma_d=0000
+ctl_start = 1
+
+Control state
+   st_instr_fet = 0  st_dispatch = 0       st_add = 0       st_sub = 0
+        st_mul0 = 0     st_cmplt = 0     st_cmpeq = 0     st_cmpgt = 0
+       st_trap0 = 0      st_lea0 = 0      st_lea1 = 0     st_load0 = 0
+       st_load1 = 0     st_load2 = 0    st_store0 = 0    st_store1 = 0
+      st_store2 = 0     st_jump0 = 0     st_jump1 = 0    st_jumpf0 = 0
+      st_jumpf1 = 1    st_jumpt0 = 0    st_jumpt1 = 0      st_jal0 = 0
+        st_jal1 = 0
+
+Control signals
+    ctl_alu_a   = 0  ctl_alu_b   = 0  ctl_alu_c   = 0  ctl_alu_d   = 0
+    ctl_x_pc    = 0  ctl_y_ad    = 1  ctl_rf_ld   = 0  ctl_rf_pc   = 0
+    ctl_rf_alu  = 0  ctl_rf_sd   = 0  ctl_ir_ld   = 0  ctl_pc_ld   = 1
+    ctl_ad_ld   = 0  ctl_ad_alu  = 0  ctl_ma_pc   = 0  ctl_sto     = 0
+
+Datapath
+    ir = f604  pc = 0010  ad = 0011   a = 0000   b = 0012   r = 0011
+     x = 0000   y = 0011   p = 0331  ma = 0011  md = 0000 cnd = 0
+
+Memory
+   ctl_sto = 0      m_sto = 0
+     m_addr = 0011  m_real_addr = 0011  m_data = 0000  m_out =0331
+
+Fetched displacement = 0011
+jumpf instruction jumped
+************************************************************************
+Executed instruction:  jumpf  R6,0011[R0]   effective address = 0011
+jumped to 0011 in cycle 67
+Processor state:    pc = 0010  ir = f604  ad = 0011
+************************************************************************
+
+........................................................................
+Clock cycle 68
+Computer system inputs
+         reset=0 dma=0 dma_a=0000 dma_d=0000
+ctl_start = 0
+
+Control state
+   st_instr_fet = 1  st_dispatch = 0       st_add = 0       st_sub = 0
+        st_mul0 = 0     st_cmplt = 0     st_cmpeq = 0     st_cmpgt = 0
+       st_trap0 = 0      st_lea0 = 0      st_lea1 = 0     st_load0 = 0
+       st_load1 = 0     st_load2 = 0    st_store0 = 0    st_store1 = 0
+      st_store2 = 0     st_jump0 = 0     st_jump1 = 0    st_jumpf0 = 0
+      st_jumpf1 = 0    st_jumpt0 = 0    st_jumpt1 = 0      st_jal0 = 0
+        st_jal1 = 0
+
+Control signals
+    ctl_alu_a   = 1  ctl_alu_b   = 1  ctl_alu_c   = 0  ctl_alu_d   = 0
+    ctl_x_pc    = 1  ctl_y_ad    = 0  ctl_rf_ld   = 0  ctl_rf_pc   = 0
+    ctl_rf_alu  = 0  ctl_rf_sd   = 0  ctl_ir_ld   = 1  ctl_pc_ld   = 1
+    ctl_ad_ld   = 0  ctl_ad_alu  = 0  ctl_ma_pc   = 1  ctl_sto     = 0
+
+Datapath
+    ir = f604  pc = 0011  ad = 0011   a = 0000   b = 0012   r = 0012
+     x = 0011   y = 0012   p = 0331  ma = 0011  md = 0000 cnd = 0
+
+Memory
+   ctl_sto = 0      m_sto = 0
+     m_addr = 0011  m_real_addr = 0011  m_data = 0000  m_out =0331
+
+
+........................................................................
+Clock cycle 69
+Computer system inputs
+         reset=0 dma=0 dma_a=0000 dma_d=0000
+ctl_start = 0
+
+Control state
+   st_instr_fet = 0  st_dispatch = 1       st_add = 0       st_sub = 0
+        st_mul0 = 0     st_cmplt = 0     st_cmpeq = 0     st_cmpgt = 0
+       st_trap0 = 0      st_lea0 = 0      st_lea1 = 0     st_load0 = 0
+       st_load1 = 0     st_load2 = 0    st_store0 = 0    st_store1 = 0
+      st_store2 = 0     st_jump0 = 0     st_jump1 = 0    st_jumpf0 = 0
+      st_jumpf1 = 0    st_jumpt0 = 0    st_jumpt1 = 0      st_jal0 = 0
+        st_jal1 = 0
+
+Control signals
+    ctl_alu_a   = 0  ctl_alu_b   = 0  ctl_alu_c   = 0  ctl_alu_d   = 0
+    ctl_x_pc    = 0  ctl_y_ad    = 0  ctl_rf_ld   = 0  ctl_rf_pc   = 0
+    ctl_rf_alu  = 0  ctl_rf_sd   = 0  ctl_ir_ld   = 0  ctl_pc_ld   = 0
+    ctl_ad_ld   = 0  ctl_ad_alu  = 0  ctl_ma_pc   = 0  ctl_sto     = 0
+
+Datapath
+    ir = 0331  pc = 0012  ad = 0011   a = 0001   b = 0001   r = 0002
+     x = 0001   y = 0001   p = 0331  ma = 0011  md = 0001 cnd = 1
+
+Memory
+   ctl_sto = 0      m_sto = 0
+     m_addr = 0011  m_real_addr = 0011  m_data = 0001  m_out =0331
+
