@@ -50,7 +50,7 @@ datapath ctlsigs memdat = (ma,md,cond,a,b,ir,pc,ad,ovfl,r,x,y,p,ready,prod,rx,ry
       rf_sb = ir_sb                                 -- b = reg[rf_sb]
       p  = mux1w (ctl_rf_pc ctlsigs)                -- regfile data input
              (mux1w (ctl_rf_alu ctlsigs) memdat r)
-             pc
+             (mux1w (ctl_rf_mul_ld ctlsigs) pc prod)
       q = mux1w (ctl_pc_ad ctlsigs) r ad        -- input to pc
       ma = mux1w (ctl_ma_pc ctlsigs) ad pc      -- memory address
       md = a                                    -- memory data

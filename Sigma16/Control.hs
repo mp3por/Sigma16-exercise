@@ -34,6 +34,11 @@ repeat forever
         st_mul0:
           reg[ir_d] := reg[ir_sa] * reg[ir_sb]
             {ctl_mul_start, }
+        st_mul1:
+          wait until ready
+        st_mul2:
+          reg[ir_d] := prod
+            {ctl_rf_mul_ld, ctl_rf_pc, ctl_rf_ld}
 
     3 -> -- div instruction
         -- unimplemented
@@ -203,11 +208,15 @@ repeat forever
 
 control
   :: Clocked a
-  => a -> [a] -> a
+  => a -> [a] -> a -> a
   -> (CtlState a, a, CtlSig a)
 
-control reset ir cond = (ctlstate,start,ctlsigs)
+control reset ir cond ready = (ctlstate,start,ctlsigs)
   where
+
+      ready1 = dff (ready)
+      mul_ready = mux2 (ready1,ready) zero one zero zero
+
 
       ir_op = field ir  0 4       -- instruction opcode
       ir_d  = field ir  4 4       -- instruction destination register
@@ -216,7 +225,7 @@ control reset ir cond = (ctlstate,start,ctlsigs)
 
       start = orw
         [reset,st_load2,st_lea1,st_add,st_sub,
-         st_mul0,st_store2,st_cmpeq,st_cmplt,st_cmpgt,
+         st_mul2,st_store2,st_cmpeq,st_cmplt,st_cmpgt,
          st_jumpt1, and2 st_jumpt0 (inv cond),
          st_jumpf1, and2 st_jumpf0 cond,
          st_jump1, st_jal1, st_trap0, st_loadxi3]
@@ -260,6 +269,10 @@ control reset ir cond = (ctlstate,start,ctlsigs)
       st_add    = dff (pRRR!!0)
       st_sub    = dff (pRRR!!1)
       st_mul0   = dff (pRRR!!2)
+      st_mul1   = dff (mux2 (st_mul1, st_mul0) zero st_mul0 (mux1 mul_ready st_mul1 zero) st_mul0)
+      st_mul2   = dff (mux2 (mul_ready, st_mul1) zero zero zero one)
+
+
       st_div0   = dff (pRRR!!3)
       st_cmplt  = dff (pRRR!!4)
       st_cmpeq  = dff (pRRR!!5)
@@ -267,8 +280,8 @@ control reset ir cond = (ctlstate,start,ctlsigs)
       st_trap0  = dff (pRRR!!13)
 
       ctl_rf_ld   = orw [st_load2,st_lea1,st_add,st_sub,
-                           st_cmpeq,st_cmplt,st_cmpgt,st_jal1, st_loadxi2, st_loadxi3]
-      ctl_rf_pc   = orw [st_jal1]
+                           st_cmpeq,st_cmplt,st_cmpgt,st_jal1, st_loadxi2, st_loadxi3, st_mul2]
+      ctl_rf_pc   = orw [st_jal1, st_mul2]
       ctl_rf_alu  = orw [st_lea1,st_add,st_sub,st_cmpeq,
                            st_cmplt,st_cmpgt, st_loadxi3]
 
@@ -306,20 +319,22 @@ control reset ir cond = (ctlstate,start,ctlsigs)
       ctl_sto     = orw [st_store2]
 
       ctl_mul_start = orw [st_mul0]
+      ctl_rf_mul_ld = orw [st_mul2]
+      --ctl_rf_mul_ld = zero
 
       ctlsigs = CtlSig
         {ctl_alu_a,  ctl_alu_b,  ctl_alu_c,  ctl_alu_d,
          ctl_x_pc,   ctl_y_ad,   ctl_rf_ld,  ctl_rf_pc,
          ctl_rf_alu, ctl_rf_sd,  ctl_ir_ld,  ctl_pc_ld,
          ctl_pc_ad,  ctl_ad_ld,  ctl_ad_alu, ctl_ma_pc,
-         ctl_sto, ctl_rf_ds, ctl_mul_start}
+         ctl_sto, ctl_rf_ds, ctl_mul_start, ctl_rf_mul_ld}
 
       ctlstate = CtlState
         {st_instr_fet,
          st_dispatch,
          st_add,
          st_sub,
-         st_mul0,
+         st_mul0,st_mul1,st_mul2,
          st_cmpeq,
          st_cmplt,
          st_cmpgt,

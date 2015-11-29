@@ -29,7 +29,7 @@ m1 reset dma dma_a dma_d =                     -- inputs: reset and dma
     (ma,md,cond,a,b,ir,pc,ad,ovfl,r,x,y,p,ready,prod,rx,ry,s) = datapath_outputs
 
 -- Control
-    (ctl_state, ctl_start, ctlsigs) = control reset ir cond
+    (ctl_state, ctl_start, ctlsigs) = control reset ir cond ready
 
 -- Memory
     m_real_addr = field m_addr (n-msize) msize

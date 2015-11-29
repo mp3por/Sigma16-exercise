@@ -247,6 +247,11 @@ sim_m1 input =
          string "    st_loadxi1 = ", bit (st_loadxi1 ctlstate),
          string "    st_loadxi2 = ", bit (st_loadxi2 ctlstate),
          string "    st_loadxi3 = ", bit (st_loadxi3 ctlstate),
+         string "\n  ",
+         string "\n  ",
+         string "    st_mul0 = ", bit (st_mul0 ctlstate),
+         string "    st_mul1 = ", bit (st_mul1 ctlstate),
+         string "    st_mul2 = ", bit (st_mul2 ctlstate),
 
          string "\n\nControl signals\n  ",
            string "  ctl_alu_a   = ", bit (ctl_alu_a ctlsigs),
@@ -271,6 +276,8 @@ sim_m1 input =
            string "\n  ",
            string "  ctl_rf_ds  = ", bit (ctl_rf_ds ctlsigs),
            string "  ctl_mul_start  = ", bit (ctl_mul_start ctlsigs),
+           string "\n  ",
+           string "  ctl_rf_mul_ld  = ", bit (ctl_rf_mul_ld ctlsigs),
 
 
          string "\n\nDatapath\n  ",

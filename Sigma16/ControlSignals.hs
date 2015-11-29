@@ -28,6 +28,7 @@ data CtlSig a = CtlSig
    ctl_rf_alu,  -- Input to register file is ALU output r (if 0, use m)
    ctl_rf_sd,   -- Use ir_d as source a address (if 0, use ir_sa)
    ctl_rf_ds,   -- Use ir_sa as destination (if 0, use ir_d)
+   ctl_rf_mul_ld, -- if ctl_rf_pc use prod as input (if 0, use pc)
 
 -- Controls for system registers
    ctl_ir_ld,   -- Load ir register (if 0, remain unchanged)
@@ -48,7 +49,7 @@ data CtlState a = CtlState
    st_dispatch,
    st_add,
    st_sub,
-   st_mul0,
+   st_mul0,st_mul1,st_mul2,
    st_cmplt,
    st_cmpeq,
    st_cmpgt,
