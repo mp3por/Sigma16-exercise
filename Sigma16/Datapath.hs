@@ -22,15 +22,16 @@ interconnections.  It has two inputs: a set of control signals
 provided by the control unit, and a data word from the either the
 memory system or the DMA input controller. -}
 
-datapath ctlsigs memdat = (ma,md,cond,a,b,ir,pc,ad,ovfl,r,x,y,p,ready,prod,rx,ry,multiply_s)
+datapath ctlsigs memdat = (ma,md,cond,a,b,ir,pc,ad,ovfl,r,x,y,p1,ready,prod,rx,ry,multiply_s)
   where
 
 -- Size parameters
       n = 16    -- word size
       k =  4    -- the register file contains 2^k registers
+      z =  8
 
 -- Registers
-      (a,b) = regfile n k (ctl_rf_ld ctlsigs) ir_dd rf_sa rf_sb p
+      (a,b) = regfile n k (ctl_rf_ld ctlsigs) ir_dd rf_sa rf_sb p1
       ir = reg n (ctl_ir_ld ctlsigs) memdat
       pc = reg n (ctl_pc_ld ctlsigs) q
       ad = reg n (ctl_ad_ld ctlsigs) (mux1w (ctl_ad_alu ctlsigs) memdat r)
@@ -50,7 +51,8 @@ datapath ctlsigs memdat = (ma,md,cond,a,b,ir,pc,ad,ovfl,r,x,y,p,ready,prod,rx,ry
       rf_sb = ir_sb                                 -- b = reg[rf_sb]
       p  = mux1w (ctl_rf_pc ctlsigs)                -- regfile data input
              (mux1w (ctl_rf_alu ctlsigs) memdat r)
-             (mux1w (ctl_rf_mul_ld ctlsigs) pc prod)
+             pc
+      p1 = mux1w (ctl_rf_mul_ld ctlsigs) p (field prod 16 16)
       q = mux1w (ctl_pc_ad ctlsigs) r ad        -- input to pc
       ma = mux1w (ctl_ma_pc ctlsigs) ad pc      -- memory address
       md = a                                    -- memory data
