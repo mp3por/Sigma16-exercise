@@ -270,7 +270,7 @@ control reset ir cond ready = (ctlstate,start,ctlsigs)
       st_sub    = dff (pRRR!!1)
       st_mul0   = dff (pRRR!!2)
       st_mul1   = dff (mux2 (st_mul1, st_mul0) zero st_mul0 (mux1 mul_ready st_mul1 zero) st_mul0)
-      st_mul2   = dff (mux2 (mul_ready, st_mul1) zero zero zero one)
+      st_mul2   = dff (and2 mul_ready st_mul1)
 
 
       st_div0   = dff (pRRR!!3)

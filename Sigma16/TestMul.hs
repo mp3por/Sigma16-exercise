@@ -165,3 +165,33 @@ test_big_positive_numbers_overflow =
   "f504", "0007",  -- 0008 then  jumpf R5,loop[R0]  ; if r3!=r4 goto loop
   "d000"           -- 000a       trap  R0,R0,R0     ; else terminate
    ]
+
+
+--------------------------------------------------------------------------
+
+---- test for big negative numbers
+---- NOTE:
+---- this test shows how my implementation overflows. This happens because the
+---- multiplier takes 2 16bits long words and produces a product which is 32bits
+---- wide. However our registry holds only 16bit words so on when saving the result
+---- we only take the 16 least significant bits from the product and thus the overflow
+
+
+--test_big_positive_numbers_overflow :: [String]
+--test_big_positive_numbers_overflow =
+---- Machine Language  Addr    Assembly Language     Comment
+---- ~~~~~~~~~~~~~~~~  ~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-- [
+--                   -- 0000 ; Initialise
+--                   -- 0000
+--  "f100", "8000",  -- 0000 start lea R1,2[R0]       ; R1 = constant 32768
+--  "f200", "0002",  -- 0002       lea R2,2[R0]       ; R2 = constant 2
+--  "2321",          -- 0004       mul R3,R2,R1       ; R3 = R2*R1
+--  "f400", "0000",  -- 0005       lea R4,4[R0]       ; R4 = constant 0 (and the real result should be f0000)
+
+--                   -- 0007 loop if (r3!=r4)
+--  "5534",          -- 0007       cmpeq R5,R3,R4     ; R5 = R3 == 15000
+--  "f504", "0007",  -- 0008 then  jumpf R5,loop[R0]  ; if r3!=r4 goto loop
+--  "d000"           -- 000a       trap  R0,R0,R0     ; else terminate
+--   ]
+

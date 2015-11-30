@@ -42,7 +42,7 @@ datapath ctlsigs memdat = (ma,md,cond,a,b,ir,pc,ad,ovfl,r,x,y,p1,ready,prod,rx,r
                        x y
 
 -- The Multiply
-      (ready,prod,rx,ry,multiply_s) = multiply n (ctl_mul_start ctlsigs) a b
+      (ready,prod,rx,ry,multiply_s) = multiply n (ctl_mul_start ctlsigs) x y
 
 -- Internal processor signals
       x = mux1w (ctl_x_pc ctlsigs) a pc             -- alu input 1
