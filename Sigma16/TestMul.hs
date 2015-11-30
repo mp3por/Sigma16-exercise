@@ -22,11 +22,28 @@ separator prog_name =
 main :: IO ()
 main =
   do
-    separator "test positive * negative numbers"
+    separator "test_small_positive_numbers"
+    run_Sigma16_program test_small_positive_numbers 200
+
+    separator "test_small_negative_numbers"
+    run_Sigma16_program test_small_negative_numbers 200
+
+    separator "test_big_positive_numbers"
+    run_Sigma16_program test_big_positive_numbers 200
+
+    separator "test_positive_negative_numbers"
+    run_Sigma16_program test_positive_negative_numbers 200
+
+    separator "test_positive_negative_numbers2"
+    run_Sigma16_program test_positive_negative_numbers2 200
+
+    separator "test_big_positive_numbers_overflow"
     run_Sigma16_program test_big_positive_numbers_overflow 200
 
-    --separator "test small negative numbers"
-    --run_Sigma16_program test_small_negative_numbers 200
+    separator "test_big_negative_numbers_overflow"
+    run_Sigma16_program test_big_negative_numbers_overflow 200
+
+
 
 ------------------------------------------------------------------------
 
