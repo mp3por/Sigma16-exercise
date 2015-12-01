@@ -1,12 +1,31 @@
 ------------------------------------------------------------------------
---  ArrayMax: machine language program for the Sigma16 architecture
+-- TestMul - a test program used to test if the Multiply functional unit
+-- has been correctly included into the M1 system.
+
+-- The Multiply function unit is added to the system in order for the
+-- circuit to handle big calculations like multiplication without the
+-- need of slowing down the clock speed. In the ideal case the circuit
+-- will schedule a multiplication on the functional unit and continue
+-- with its work while the functional unit does the calculation. This
+-- will allow the clock speed to remain closer to the amount of time
+-- needed by the ALU to make simple calculations like add,compare,remove
+-- rather than having to slow down to wait for a multiplication and thus
+-- keep the system fast and responsive. However a full asynchronous
+-- implementation for a functional unit will require a way to handle
+-- data dependencies between instructions which hard and not in the
+-- scope of this assignment. Therefore the current M1 circuit takes
+-- full advantage of the functional unit, by leaving the multiplication
+-- to it, and keeps its clock speed the same, but stalls until the unit
+-- is ready with the result.
+
+-- A multiplication takes a variable amount of cycles because it
+-- involves a pipeline of rippleAdders. The general idea behind
+-- multiplication 'x*y' is summing 'x' with itself 'y' times and if we
+-- consider an addition takes one clock cycle we can see why a
+-- multiplication takes a lot more.
 ------------------------------------------------------------------------
 
-{- A machine language program for the Sigma16 architecture that
-searches an array of natural numbers for the maximal element.  The
-loop terminates when a negative element is encountered. -}
-
-module Main where
+module TestMul where
 import HDL.Hydra.Core.Lib
 import M1run
 

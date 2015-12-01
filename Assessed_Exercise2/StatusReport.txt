@@ -38,7 +38,7 @@ do the following things:
 
   1.1 load value of x[R3] into R5
 
-  1.2 increment the R[3] value
+  1.2 increment the [R3] value ( which holds the index of the array )
 --------------------------------------------------------------------------------
 
 2. Now I have to add the appropriate Control States. Those states must be first
@@ -55,7 +55,7 @@ must be modified to include output for them for easier debugging.
 3. Now that I have all of the control states I need to define which control
 signals are active during each state
 
-  3.1 The first 3 states get added to the 'orw' to the same control signals as
+  3.1 The first 3 states get added to the 'orw' of the same control signals as
   the equivalent 'load' states since they do the same thing
 
   3.2 Incrementing with 1 ( done with the ALU ) and save the result in the R3
